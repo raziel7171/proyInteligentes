@@ -7,11 +7,12 @@ import expertsystem.Motor;
 import expertsystem.Rule;
 import expertsystem.IFact;
 import expertsystem.HumanInterface;
+        
 
 public class Main implements HumanInterface {
-
+    
     public Scanner keyboard = new Scanner(System.in);
-
+    public FileReaderClass fileReader = new FileReaderClass();
     public static void main(String[] args) {
         Main app = new Main();
         app.run();
@@ -21,7 +22,7 @@ public class Main implements HumanInterface {
     public void run() {
         // Creación del motor
         Motor motor = new Motor(this);
-
+        System.out.println(fileReader.reader("veame.txt"));
         // Agregar las reglas
         System.out.println("Agregando reglas...");
         motor.addRule("R1 : IF (Orden=3(¿Cuál es el orden?)) THEN  Triángulo");
