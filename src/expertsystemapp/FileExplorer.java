@@ -5,10 +5,20 @@
  */
 package expertsystemapp;
 
+import expertsystem.HumanInterface;
+import expertsystem.IFact;
+import expertsystem.Motor;
+import expertsystem.Rule;
+import java.awt.TextArea;
 import java.io.File;
+import static java.lang.Integer.parseInt;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
@@ -18,15 +28,67 @@ import javax.swing.WindowConstants;
  * @author Juliana
  */
 public class FileExplorer extends javax.swing.JFrame {
-public FileReaderClass fileReader = new FileReaderClass();
+
+    public FileReaderClass fileReader = new FileReaderClass();
 
     /**
      * Creates new form FileExplorer
      */
     public FileExplorer() {
-        
+
         initComponents();
         this.setLocationRelativeTo(null);
+    }
+
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
+
+    public int askIntValue(String question) {
+        System.out.println(question);
+        String answer = "";
+        try {
+            answer = JOptionPane.showInputDialog(question);
+            if (isNumeric(answer)) {
+                return parseInt(answer);
+            }
+
+        } catch (Exception e) {
+            return 0;
+        }
+        return 0;
+
+    }
+
+    public boolean askBoolValue(String question) {
+        String answer = "";
+        try {
+            answer = JOptionPane.showInputDialog(question + " (si, no)");
+            return (answer.equals("si"));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public void printFacts(List<IFact> facts) {
+        String answer = "Solución(es) encontrada(s) : \n";
+        Collections.sort(facts, (IFact f1, IFact f2) -> {
+            return Integer.compare(f2.getLevel(), f1.getLevel());
+        });
+        for (IFact f : facts) {
+            if (f.getLevel() != 0) {
+                answer += f.toString() + "\n";
+            }
+        }
+        txtArea.append(answer);
+    }
+
+    public void printRules(List<Rule> rules) {
+        String answer = "";
+        for (Rule r : rules) {
+            answer += r.toString() + "\n";
+        }
+        txtArea.append(answer);
     }
 
     /**
@@ -42,13 +104,10 @@ public FileReaderClass fileReader = new FileReaderClass();
         jPanel2 = new javax.swing.JPanel();
         pathFile = new javax.swing.JTextField();
         chooseFileBtn = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        confirmFileBtn = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jButton3 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        txtArea = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -72,11 +131,20 @@ public FileReaderClass fileReader = new FileReaderClass();
             }
         });
 
-        jButton1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jButton1.setText("Aceptar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        confirmFileBtn.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        confirmFileBtn.setText("Aceptar");
+        confirmFileBtn.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+                confirmFileBtnAncestorMoved(evt);
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
+        confirmFileBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                confirmFileBtnActionPerformed(evt);
             }
         });
 
@@ -88,16 +156,9 @@ public FileReaderClass fileReader = new FileReaderClass();
             }
         });
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
-
-        jButton3.setText("Continuar");
-
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel2.setText("Respuesta:");
+        txtArea.setColumns(20);
+        txtArea.setRows(5);
+        jScrollPane1.setViewportView(txtArea);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -112,14 +173,10 @@ public FileReaderClass fileReader = new FileReaderClass();
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(chooseFileBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(confirmFileBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 580, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -131,17 +188,11 @@ public FileReaderClass fileReader = new FileReaderClass();
                     .addComponent(pathFile, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chooseFileBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
+                .addComponent(confirmFileBtn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2))
+                .addComponent(jButton2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -197,18 +248,22 @@ public FileReaderClass fileReader = new FileReaderClass();
         JFileChooser jf = new JFileChooser();
         jf.showOpenDialog(this);
         File file = jf.getSelectedFile();
-        if(file != null){
+        if (file != null) {
             pathFile.setText(file.getAbsolutePath());
         }
     }//GEN-LAST:event_chooseFileBtnActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        System.out.println(fileReader.reader(pathFile.getText()));
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void confirmFileBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmFileBtnActionPerformed
+        Main main = new Main(txtArea);
+    }//GEN-LAST:event_confirmFileBtnActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void confirmFileBtnAncestorMoved(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_confirmFileBtnAncestorMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_confirmFileBtnAncestorMoved
 
     /**
      * @param args the command line arguments
@@ -253,21 +308,20 @@ public FileReaderClass fileReader = new FileReaderClass();
                 }
                 new FileExplorer().setVisible(true);
             }
-        });
+        }
+        );
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseFileBtn;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton confirmFileBtn;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField pathFile;
+    private javax.swing.JTextArea txtArea;
     // End of variables declaration//GEN-END:variables
 }
