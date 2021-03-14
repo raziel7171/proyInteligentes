@@ -7,6 +7,7 @@ package expertsystemapp;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 /**
@@ -15,21 +16,23 @@ import java.util.Scanner;
  */
 public class FileReaderClass {
 
-    public static String reader(String path) {
+    public static LinkedList<String> reader(String path) {
 
         File file = new File(path);
+        LinkedList<String> content = new LinkedList<String>(); 
         try {
             Scanner scan = new Scanner(file);
-            String content = "";
+            
             while (scan.hasNextLine()) {
-                content = content.concat(scan.nextLine() + "\n");
+                content.add(scan.nextLine());
+                
             }
-            System.out.println(content);
-            return content;                   
+            System.out.println(content.size());
+            return content;
         } catch (FileNotFoundException e) {
             System.out.println("Archivo no encontrado o no legible");
         } finally {
-            return "";
+            return content;
         }
 
     }

@@ -7,6 +7,8 @@ import expertsystem.Motor;
 import expertsystem.Rule;
 import expertsystem.IFact;
 import expertsystem.HumanInterface;
+import java.util.ArrayList;
+import java.util.LinkedList;
         
 
 public class Main implements HumanInterface {
@@ -22,20 +24,17 @@ public class Main implements HumanInterface {
     public void run() {
         // Creación del motor
         Motor motor = new Motor(this);
-        System.out.println(fileReader.reader("veame.txt"));
+        LinkedList<String> lines = new LinkedList<String>();
+        lines = fileReader.reader("Rules.txt");
         // Agregar las reglas
-        System.out.println("Agregando reglas...");
-        motor.addRule("R1 : IF (Orden=3(¿Cuál es el orden?)) THEN  Triángulo");
-        motor.addRule("R2 : IF (Triángulo AND Ángulo Recto(¿La figura tiene al menos un ángulo recto?)) THEN Triángulo Rectángulo");
-        motor.addRule("R3 : IF (Triángulo AND Lados Iguales=2(¿Cuántos lados iguales tiene la figura?)) THEN Triángulo Isósceles");
-        motor.addRule("R4 : IF (Triángulo rectángulo AND Triángulo Isósceles) THEN Triángulo Rectángulo Isósceles");
-        motor.addRule("R5 : IF (Triángulo AND Lados Iguales=3(¿Cuántos lados iguales tiene la figura?)) THEN Triángulo Equilátero");
-        motor.addRule("R6 : IF (Orden=4(¿Cuál es el orden?)) THEN Cuadrilátero");
-        motor.addRule("R7 : IF (Cuadrilátero AND Lados Paralelos=2(¿Cuántos lados paralelos entre sí - 0, 2 o 4?)) THEN Trapecio");
-        motor.addRule("R8 : IF (Cuadrilátero AND Lados Paralelos=4(¿Cuántos lados paralelos entre sí - 0, 2 o 4?)) THEN Paralelogramo");
-        motor.addRule("R9 : IF (Paralelogramo AND Ángulo Recto(¿La figura tiene al menos un ángulo recto?)) THEN Rectángulo");
-        motor.addRule("R10 : IF (Paralelogramo AND Lados Iguales=4(¿Cuántos lados iguales tiene la figura?)) THEN Rombo");
-        motor.addRule("R11 : IF (Rectángulo AND Rombo THEN Cuadrado");
+        System.out.println(lines.size());
+        
+        
+        for (int i = 0; i < lines.size(); i++) {
+            System.out.println(lines.get(i));
+            motor.addRule(lines.get(i));
+        }
+        
 
         // Resolución
         do {
